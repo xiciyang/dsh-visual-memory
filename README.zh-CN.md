@@ -48,6 +48,7 @@ visual_inspect({ views: [{ id: "VM-…", region: "0,0,800,600" }, { id: "VM-…"
 - **DSH 0.2.0-rc.2**（`engines.dsh: ">=0.2.0 <0.3.0"`）；包内声明 `dsh.bundle.patch`，`dsh plugin add` 才会激活这一层。
 - **Node.js ≥ 22**。
 - **Python 3 + Pillow**（`python3 -m pip install pillow`）：像素引擎 `lib/imaging.py` 是子进程，插件不自带图像编解码。
+- **仅限桌面 / 服务器**：像素引擎 spawn `python3`，Android 暂不支持（`dsh-plugin-lint` 报 `A2-subprocess-tool`）。纯 JS 后备是下一步。
 - **观测路径**需要声明了 image 输入的模型路由；插件不假设，而是探测实时路由（`visual_memory_status.routeCapability`）。
   纯文本路由下图片照样存储，可通过 DSH 输出的 `sha256:xxxxxxxx` 句柄找回。
 

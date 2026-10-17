@@ -48,6 +48,9 @@ visual_inspect({ views: [{ id: "VM-…", region: "0,0,800,600" }, { id: "VM-…"
 - Node.js **>= 22**.
 - Python 3 with **Pillow** (`python3 -m pip install pillow`) — the pixel engine
   (`lib/imaging.py`) is a subprocess; the plugin does not vendor an image codec.
+- **Desktop / server only** for now: the pixel engine spawns `python3`, so
+  Android is out of scope (`dsh-plugin-lint` flags this as `A2-subprocess-tool`).
+  A pure-JS fallback is the obvious next step if mobile matters.
 - A model route that declares image input for the *observation* path. The
   plugin probes the live route (`visual_memory_status.routeCapability`) instead
   of assuming; on a text-only route, images are still stored and are reachable
