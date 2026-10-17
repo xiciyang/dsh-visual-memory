@@ -1,0 +1,5 @@
+node_modules/
+.dsh-visual-memory/
+.trash-*/
+*.log
+.DS_Store

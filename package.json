@@ -1,0 +1,46 @@
+{
+  "name": "dsh-visual-memory",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Lossless visual memory for DSH agents: verbatim content-addressed image storage, an explicit-attention ledger, labelled comparison sheets, and exact pixel reads — no second vision model in the loop.",
+  "main": "lib/index.mjs",
+  "license": "MIT",
+  "author": "xiciyang",
+  "homepage": "https://github.com/xiciyang/dsh-visual-memory#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xiciyang/dsh-visual-memory.git"
+  },
+  "bugs": {
+    "url": "https://github.com/xiciyang/dsh-visual-memory/issues"
+  },
+  "engines": {
+    "dsh": ">=0.2.0 <0.3.0",
+    "node": ">=22"
+  },
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "dsh",
+    "visual-memory",
+    "image-memory",
+    "agent-memory",
+    "multimodal"
+  ],
+  "scripts": {
+    "test": "node verify.mjs"
+  },
+  "files": [
+    "lib/",
+    "cordis.patch.yml",
+    "verify.mjs",
+    "README.md",
+    "README.zh-CN.md",
+    "LICENSE"
+  ],
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
