@@ -16,11 +16,12 @@
 ## 安装
 
 ```sh
-dsh plugin --profile <name> add dsh-visual-memory
+# 从公开仓库装（npm 发布待完成）
+dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
 dsh --profile <name> --dump-config   # 应出现 "# == dsh-visual-memory" 这一层
 ```
 
-从源码装：
+从本地源码装：
 
 ```sh
 git clone https://github.com/xiciyang/dsh-visual-memory

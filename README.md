@@ -13,17 +13,19 @@ not change when you switch models.
 ## Install
 
 ```sh
-# into any DSH profile
-dsh plugin --profile <name> add dsh-visual-memory
+# from the public repository (npm publication pending)
+dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
 dsh --profile <name> --dump-config   # expect a "# == dsh-visual-memory" layer
 ```
 
-From a source checkout instead:
+From a local checkout:
 
 ```sh
 git clone https://github.com/xiciyang/dsh-visual-memory
 dsh plugin --profile <name> add ./dsh-visual-memory
 ```
+
+Once published to npm, `dsh plugin --profile <name> add dsh-visual-memory` will be the short form.
 
 ## Quick start
 
