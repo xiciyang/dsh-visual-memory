@@ -133,7 +133,15 @@ assembling views out of memory is a distinct capability, not a second crop tool.
 
 Web seam: `GET /_dsh/visual-memory/gallery` renders the memory (thumbnails,
 attention ledger, indexed text, hashes); `/_dsh/visual-memory/raw?id=VM-…`
-serves the exact stored original.
+serves the exact stored original, and `&v=<variant>` serves one overlay or
+comparison sheet that the record itself lists.
+
+The web seam is not an Agent authority boundary. Every request is refused
+unless the composition's `connection.requestRejection` accepts it (Host/Origin
+fence + browser authentication), `root` must be a root this plugin registered,
+and `v` is resolved only from the record's own listed variants and only when the
+real path stays inside that store's `artifacts/` directory — a caller-supplied
+path is never read.
 
 ## Storage layout
 
@@ -154,11 +162,13 @@ npm test                       # = node verify.mjs
 node verify.mjs [path/to/index.jsonl]
 ```
 
-Runs 11 checks: bundle contract, patch/profile wiring (restart persistence), the
+Runs 16 checks: bundle contract, patch/profile wiring (restart persistence), the
 pixel engine against a fixture with authored colours (probe, `read_pixels`,
-crop+enlarge, compose, overlay clamping), the lossless-JSON invariant
-(`jsonSafe` on every tool return — an unguarded `undefined` once rejected a
-whole call), and re-hashing every stored original against its recorded sha256.
+crop+enlarge, compose, overlay clamping), the web seam's trust fence and path
+fence (untrusted request, caller-named root, arbitrary `v` path, symlink escape,
+and the two legitimate reads), the lossless-JSON invariant (`jsonSafe` on every
+tool return — an unguarded `undefined` once rejected a whole call), and
+re-hashing every stored original against its recorded sha256.
 
 The host-side path (`ctx.attachments`, `ctx.fs`, `ctx.tools`) is exercised by
 calling the real tools; this script does not claim to cover it.

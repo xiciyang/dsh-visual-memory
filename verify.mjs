@@ -30,9 +30,9 @@ const HOME = process.env.DSH_HOME ?? path.join(os.homedir(), '.dsh')
 
 const work = fs.mkdtempSync(path.join(os.tmpdir(), 'vm-verify-'))
 const results = []
-const check = (name, fn) => {
+const check = async (name, fn) => {
   try {
-    results.push({ name, ok: true, detail: fn() ?? '' })
+    results.push({ name, ok: true, detail: (await fn()) ?? '' })
   } catch (error) {
     results.push({ name, ok: false, detail: String(error?.message ?? error) })
   }
@@ -48,24 +48,24 @@ function py(request) {
 try {
   // -------------------------------------------------------------- 1. contract
   const mod = await import(ENTRY)
-  check('bundle contract: name / inject / apply', () => {
+  await check('bundle contract: name / inject / apply', () => {
     assert.equal(mod.name, 'visual-memory')
-    assert.deepEqual([...mod.inject].sort(), ['attachments', 'fs', 'systemPrompt', 'tools', 'webServer'])
+    assert.deepEqual([...mod.inject].sort(), ['attachments', 'connection', 'fs', 'systemPrompt', 'tools', 'webServer'])
     assert.equal(typeof mod.apply, 'function')
     return 'name=' + mod.name + ' inject=' + JSON.stringify(mod.inject)
   })
 
   const patch = fs.readFileSync(path.join(HERE, 'cordis.patch.yml'), 'utf8')
-  check('patch row matches the module inject list', () => {
+  await check('patch row matches the module inject list', () => {
     const declared = [...patch.matchAll(/^\s+- (\w+)$/gm)].map((m) => m[1]).sort()
-    assert.deepEqual(declared, ['attachments', 'fs', 'systemPrompt', 'tools', 'webServer'])
+    assert.deepEqual(declared, ['attachments', 'connection', 'fs', 'systemPrompt', 'tools', 'webServer'])
     assert.match(patch, /id: visual-memory/)
     assert.match(patch, /name: 'dsh-visual-memory'/)
-    return 'cordis.patch.yml declares the same 5 services'
+    return 'cordis.patch.yml declares the same 6 services'
   })
 
   // --------------------------------------------------------------- 2. wiring
-  check('profiles/web wires the bundle for restart', () => {
+  await check('profiles/web wires the bundle for restart', () => {
     const profile = path.join(HOME, 'profiles', 'web')
     const pkg = JSON.parse(fs.readFileSync(path.join(profile, 'package.json'), 'utf8'))
     assert.ok(pkg.dependencies['dsh-visual-memory'], 'dependency missing')
@@ -77,14 +77,14 @@ try {
   // --------------------------------------------------------- 3. pixel engine
   const source = path.join(work, 'fixture.png')
   const fixture = py({ op: 'draw', path: source })
-  check('fixture has the exact authored geometry', () => {
+  await check('fixture has the exact authored geometry', () => {
     assert.equal(fixture.width, 64)
     assert.equal(fixture.height, 32)
     assert.deepEqual(fixture.quadrants, ['#ff0000', '#00ff00', '#0000ff', '#ffffff'])
     return '64x32, four known quadrant colours'
   })
 
-  check('probe reports dimensions and a 64-bit dHash', () => {
+  await check('probe reports dimensions and a 64-bit dHash', () => {
     const probed = py({ op: 'probe', path: source })
     assert.equal(probed.width, 64)
     assert.equal(probed.height, 32)
@@ -92,14 +92,14 @@ try {
     return `${probed.width}x${probed.height} dHash=${probed.dhash} format=${probed.format}`
   })
 
-  check('read_pixels 2x2 reads exactly the authored quadrants', () => {
+  await check('read_pixels 2x2 reads exactly the authored quadrants', () => {
     const pixels = py({ op: 'pixels', path: source, rows: 2, cols: 2 })
     assert.deepEqual(pixels.cells, [['#ff0000', '#00ff00'], ['#0000ff', '#ffffff']])
     assert.equal(pixels.distinctCount, 4)
     return JSON.stringify(pixels.cells)
   })
 
-  check('crop + enlarge preserves the sampled colour', () => {
+  await check('crop + enlarge preserves the sampled colour', () => {
     const cropped = py({
       op: 'crop',
       path: source,
@@ -114,7 +114,7 @@ try {
     return `region -> ${cropped.width}x${cropped.height}, centre still #ff0000`
   })
 
-  check('compose lays two panels out side by side', () => {
+  await check('compose lays two panels out side by side', () => {
     const composed = py({
       op: 'compose',
       output: path.join(work, 'sheet.png'),
@@ -128,7 +128,7 @@ try {
     return `${composed.width}x${composed.height}`
   })
 
-  check('overlay clamps negative and oversized boxes to the frame', () => {
+  await check('overlay clamps negative and oversized boxes to the frame', () => {
     const clipped = py({
       op: 'overlay',
       path: source,
@@ -139,9 +139,133 @@ try {
     return 'clamped to 0,0,64,32'
   })
 
+  // ------------------------------- 3b. gallery/raw: trust fence + path fence
+  // The route is browser-reachable, so these are the security seam: refuse an
+  // untrusted caller, refuse a caller-named store root, and never let `v` read
+  // a path the store did not write. Each case asserts on the bytes, not just
+  // the status, because a 200 is the only way a secret could escape.
+  {
+    const store = path.join(work, 'store')
+    const artifacts = path.join(store, 'artifacts')
+    const dshHome = path.join(work, 'dsh-home')
+    fs.mkdirSync(artifacts, { recursive: true })
+    fs.mkdirSync(dshHome, { recursive: true })
+    const original = path.join(work, 'original.png')
+    fs.copyFileSync(source, original)
+    const overlay = path.join(artifacts, 'overlay.png')
+    fs.copyFileSync(source, overlay)
+    const secret = path.join(work, 'secret.txt')
+    fs.writeFileSync(secret, 'TOP-SECRET-DO-NOT-SERVE')
+    const escape = path.join(artifacts, 'escape.png')
+    let symlinked = true
+    try {
+      fs.symlinkSync(secret, escape)
+    } catch {
+      symlinked = false
+    }
+    const record = {
+      v: 1,
+      id: 'VM-test',
+      sha256: 'a'.repeat(64),
+      format: 'png',
+      bytes: fs.statSync(source).size,
+      width: 64,
+      height: 32,
+      dhash: '0'.repeat(16),
+      originalHostPath: original,
+      // The index itself lists an arbitrary path and a symlink as variants:
+      // being listed is necessary but must not be sufficient.
+      overlays: symlinked ? [secret, escape, overlay] : [secret, overlay],
+      composites: [],
+      rois: [],
+      tags: [],
+      note: '',
+      text: '',
+    }
+    fs.writeFileSync(path.join(store, 'index.jsonl'), JSON.stringify(record) + '\n', 'utf8')
+    fs.writeFileSync(path.join(dshHome, 'visual-memory-roots.json'), JSON.stringify([{ root: store }]), 'utf8')
+
+    const savedHome = process.env.DSH_HOME
+    const savedCwd = process.cwd()
+    process.env.DSH_HOME = dshHome
+    process.chdir(work)
+    const routes = []
+    const tools = []
+    const fakeCtx = {
+      effect: (fn) => fn(),
+      systemPrompt: { section: (value) => value },
+      tools: { register: (tool) => (tools.push(tool), tool) },
+      webServer: { register: (route) => (routes.push(route), route) },
+      connection: { requestRejection: (req) => (req.headers?.['x-test-untrusted'] === '1' ? 403 : undefined) },
+      get: () => undefined,
+    }
+    mod.apply(fakeCtx)
+    const route = routes.find((entry) => entry.path === '/_dsh/visual-memory')
+    const call = async (query, headers = {}) => {
+      const res = {
+        status: 0,
+        headers: {},
+        body: undefined,
+        writeHead(status, sent) {
+          this.status = status
+          this.headers = sent ?? {}
+          return this
+        },
+        end(body) {
+          this.body = body
+        },
+      }
+      await route.handler({ url: '/_dsh/visual-memory' + query, headers }, res)
+      return res
+    }
+    const text = (res) => (Buffer.isBuffer(res.body) ? res.body.toString('hex') : String(res.body ?? ''))
+
+    try {
+      await check('raw route: an untrusted request is refused before any bytes', async () => {
+        const res = await call('/gallery', { 'x-test-untrusted': '1' })
+        assert.equal(res.status, 403)
+        assert.equal(res.body, undefined)
+        return '403, empty body'
+      })
+
+      await check('raw route: a caller-named root is refused', async () => {
+        const res = await call('/gallery?root=' + encodeURIComponent(path.dirname(secret)))
+        assert.equal(res.status, 400)
+        return '400 unknown store root'
+      })
+
+      await check('raw route: v=<arbitrary path> cannot read outside the store', async () => {
+        for (const candidate of [secret, escape, '/etc/passwd', original]) {
+          const res = await call('/raw?id=VM-test&v=' + encodeURIComponent(candidate))
+          assert.notEqual(res.status, 200, 'served ' + candidate)
+          assert.ok(!text(res).includes(Buffer.from('TOP-SECRET').toString('hex')), 'leaked secret bytes')
+        }
+        return 'secret, symlink, /etc/passwd and a non-listed original are all refused'
+      })
+
+      await check('raw route: the archived original is still served verbatim', async () => {
+        const res = await call('/raw?id=VM-test')
+        assert.equal(res.status, 200)
+        assert.deepEqual(Buffer.from(res.body), fs.readFileSync(original))
+        return 'bytes identical to the archived original'
+      })
+
+      await check('raw route: a store-written overlay is served, by name only', async () => {
+        const res = await call('/raw?id=VM-test&v=' + encodeURIComponent(overlay))
+        assert.equal(res.status, 200)
+        assert.deepEqual(Buffer.from(res.body), fs.readFileSync(overlay))
+        return 'listed + inside artifacts/ => 200'
+      })
+    } finally {
+      process.chdir(savedCwd)
+      if (savedHome === undefined) delete process.env.DSH_HOME
+      else process.env.DSH_HOME = savedHome
+    }
+  }
+
   // ------------------------------------------------------ 4. lossless-JSON rule
   const sourceText = fs.readFileSync(ENTRY, 'utf8')
-  check('every tool result passes through jsonSafe', () => {
+  await check('every tool result passes through jsonSafe', () => {
     const bare = [...sourceText.matchAll(/\n {6}return \{\n/g)].length
     assert.equal(bare, 0, bare + ' bare `return {` left in a tool body')
     const wrapped = [...sourceText.matchAll(/return jsonSafe\(\{/g)].length
@@ -150,7 +274,7 @@ try {
   })
 
   // ------------------------------------------------------------ 5. losslessness
-  check('stored originals re-hash to their recorded sha256', () => {
+  await check('stored originals re-hash to their recorded sha256', () => {
     const indexPath = process.argv[2] ?? path.join(process.cwd(), '.dsh-visual-memory', 'index.jsonl')
     if (!fs.existsSync(indexPath)) return 'skipped: no index at ' + indexPath
     const seen = new Set()

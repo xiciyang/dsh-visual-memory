@@ -69,7 +69,7 @@ visual_inspect({ views: [{ id: "VM-…", region: "0,0,800,600" }, { id: "VM-…"
 
 | DSH | 状态 |
 |---|---|
-| 0.2.0-rc.2 | 2026-10-17 验证通过：`node verify.mjs` 11/11，真实工具端到端调用 |
+| 0.2.0-rc.2 | 2026-10-17 验证通过：`node verify.mjs` 16/16，真实工具端到端调用 |
 | < 0.2.0 | 未测试；`engines.dsh` 会拒绝安装 |
 | ≥ 0.3.0 | 未测试；要放宽版本范围，先在该版本上跑一遍 `npm test` |
 
@@ -77,7 +77,7 @@ visual_inspect({ views: [{ id: "VM-…", region: "0,0,800,600" }, { id: "VM-…"
 
 ```sh
 npm test          # = node verify.mjs
-node verify.mjs   # 11 项检查，不需要启动 DSH 进程
+node verify.mjs   # 16 项检查，不需要启动 DSH 进程
 ```
 
 覆盖：加载器强制的 bundle 契约、重启后仍生效的 profile 接线、用已知颜色夹具验证像素引擎（probe / read_pixels / crop /
@@ -111,7 +111,11 @@ compose / overlay）、曾经把工具打挂的 lossless-JSON 不变量、以及
 | `visual_memory_status` | 现在到底有什么能力，当前模型能不能看见 |
 
 Web 接缝：`GET /_dsh/visual-memory/gallery` 渲染记忆库（缩略图、注意力账本、索引文本、哈希）；
-`/_dsh/visual-memory/raw?id=VM-…` 返回逐字节原图。
+`/_dsh/visual-memory/raw?id=VM-…` 返回逐字节原图，`&v=<变体>` 返回该条目自己登记的叠加图或对比图。
+
+Web 接缝不是 Agent 的权限边界：每个请求先经组合的 `connection.requestRejection`
+（Host/Origin 栅栏 + 浏览器认证）放行；`root` 只能是本插件登记过的库；`v`
+只能取自该条目登记的变体，且真实路径必须落在该库的 `artifacts/` 内——调用方给的路径永远不会被读。
 
 ## 存储布局
 
