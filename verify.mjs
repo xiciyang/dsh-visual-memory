@@ -228,6 +228,13 @@ try {
         return '403, empty body'
       })
 
+      await check('gallery: a trusted request still renders the store', async () => {
+        const res = await call('/gallery')
+        assert.equal(res.status, 200)
+        assert.match(text(res), /VM-test/)
+        return '200, entry listed'
+      })
+
       await check('raw route: a caller-named root is refused', async () => {
         const res = await call('/gallery?root=' + encodeURIComponent(path.dirname(secret)))
         assert.equal(res.status, 400)

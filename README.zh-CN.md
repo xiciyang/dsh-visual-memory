@@ -69,7 +69,7 @@ visual_inspect({ views: [{ id: "VM-…", region: "0,0,800,600" }, { id: "VM-…"
 
 | DSH | 状态 |
 |---|---|
-| 0.2.0-rc.2 | 2026-10-17 验证通过：`node verify.mjs` 16/16，真实工具端到端调用 |
+| 0.2.0-rc.2 | 2026-10-17 验证通过：`node verify.mjs` 17/17，真实工具端到端调用 |
 | < 0.2.0 | 未测试；`engines.dsh` 会拒绝安装 |
 | ≥ 0.3.0 | 未测试；要放宽版本范围，先在该版本上跑一遍 `npm test` |
 
@@ -77,7 +77,7 @@ visual_inspect({ views: [{ id: "VM-…", region: "0,0,800,600" }, { id: "VM-…"
 
 ```sh
 npm test          # = node verify.mjs
-node verify.mjs   # 16 项检查，不需要启动 DSH 进程
+node verify.mjs   # 17 项检查，不需要启动 DSH 进程
 ```
 
 覆盖：加载器强制的 bundle 契约、重启后仍生效的 profile 接线、用已知颜色夹具验证像素引擎（probe / read_pixels / crop /

@@ -162,11 +162,11 @@ npm test                       # = node verify.mjs
 node verify.mjs [path/to/index.jsonl]
 ```
 
-Runs 16 checks: bundle contract, patch/profile wiring (restart persistence), the
+Runs 17 checks: bundle contract, patch/profile wiring (restart persistence), the
 pixel engine against a fixture with authored colours (probe, `read_pixels`,
 crop+enlarge, compose, overlay clamping), the web seam's trust fence and path
 fence (untrusted request, caller-named root, arbitrary `v` path, symlink escape,
-and the two legitimate reads), the lossless-JSON invariant (`jsonSafe` on every
+the trusted gallery render, and the two legitimate raw reads), the lossless-JSON invariant (`jsonSafe` on every
 tool return — an unguarded `undefined` once rejected a whole call), and
 re-hashing every stored original against its recorded sha256.
 
