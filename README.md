@@ -12,11 +12,18 @@ model in the loop.
 ## Install
 
 ```sh
-dsh plugin --profile <name> add dsh-visual-memory            # npm
-# or pin the repository directly:
+# recommended: resolves against the repository, so it works behind any registry mirror
 dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
+
+# npm (registry.npmjs.org): short form
+dsh plugin --profile <name> add dsh-visual-memory
 dsh --profile <name> --dump-config      # expect a "# == dsh-visual-memory" layer
 ```
+
+> If your environment uses a China mirror (e.g. `registry.npmmirror.com`), its `latest`
+> tag can still point at the `0.0.0-stage` placeholder npm created for the first staged
+> publish, and installing that placeholder fails with `ERR_PNPM_TARBALL_EXTRACT`.
+> Use the `github:` form above, or `npm i dsh-visual-memory@0.1.4` to pin the version.
 
 One bundle layer, seven tools. Remove with `dsh plugin --profile <name> remove dsh-visual-memory`.
 
