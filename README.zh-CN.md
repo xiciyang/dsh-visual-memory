@@ -12,12 +12,13 @@ English | 中文
 ## 安装
 
 ```sh
+dsh plugin --profile <name> add dsh-visual-memory            # npm
+# 或直接锁仓库：
 dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
 dsh --profile <name> --dump-config      # 应出现 "# == dsh-visual-memory" 这一层
 ```
 
 一个 bundle 层、七个工具。卸载：`dsh plugin --profile <name> remove dsh-visual-memory`。
-npm 短命令（`add dsh-visual-memory`）随首次 npm 发布开放。
 
 从本地源码装：
 

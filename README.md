@@ -12,12 +12,13 @@ model in the loop.
 ## Install
 
 ```sh
+dsh plugin --profile <name> add dsh-visual-memory            # npm
+# or pin the repository directly:
 dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
 dsh --profile <name> --dump-config      # expect a "# == dsh-visual-memory" layer
 ```
 
 One bundle layer, seven tools. Remove with `dsh plugin --profile <name> remove dsh-visual-memory`.
-The npm short form (`add dsh-visual-memory`) lands with the first npm release.
 
 From a local checkout:
 
