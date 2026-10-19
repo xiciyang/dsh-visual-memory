@@ -1,6 +1,6 @@
 {
   "name": "dsh-visual-memory",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "type": "module",
   "description": "Lossless visual memory for DSH agents: verbatim content-addressed image storage, an explicit-attention ledger, labelled comparison sheets, and exact pixel reads — no second vision model in the loop.",
   "main": "lib/index.mjs",

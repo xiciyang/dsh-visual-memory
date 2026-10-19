@@ -23,7 +23,8 @@ dsh --profile <name> --dump-config      # expect a "# == dsh-visual-memory" laye
 > If your environment uses a China mirror (e.g. `registry.npmmirror.com`), its `latest`
 > tag can still point at the `0.0.0-stage` placeholder npm created for the first staged
 > publish, and installing that placeholder fails with `ERR_PNPM_TARBALL_EXTRACT`.
-> Use the `github:` form above, or `npm i dsh-visual-memory@0.1.4` to pin the version.
+> Use the `github:` form above until the mirror syncs; the npm short form is only safe
+> against a registry that already reports `latest = 0.1.5` (`npm view dsh-visual-memory version`).
 
 One bundle layer, seven tools. Remove with `dsh plugin --profile <name> remove dsh-visual-memory`.
 
