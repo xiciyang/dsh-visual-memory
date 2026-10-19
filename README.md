@@ -1,22 +1,23 @@
 # dsh-visual-memory
 
-Lossless visual memory for a DSH agent: store an image once, address it forever,
-look at it closely, compare it with others, and find it again — with a measured
-answer to whether the routed model can actually see.
+**Lossless visual memory for a DSH agent.** Store an image once; every later
+question is answered from the original bytes — exact pixels, exact replay,
+findable by text, tag, sha256, turn range or near-duplicate. No second vision
+model in the loop.
 
-**Why another memory plugin?** Text memory stores *descriptions*. This stores
-*bytes*: the original file is committed verbatim, addressed by sha256, and every
-later question is answered from that original — not from a vision model's
-paraphrase of it. Two consequences: pixel values stay exact, and the answer does
-not change when you switch models.
+![store once, read exactly, find it later](docs/demo.png)
+
+`DSH 0.2.0-rc.2` · `Node >= 22` · MIT · `node verify.mjs` 17/17
 
 ## Install
 
 ```sh
-# from the public repository (npm publication pending)
 dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
-dsh --profile <name> --dump-config   # expect a "# == dsh-visual-memory" layer
+dsh --profile <name> --dump-config      # expect a "# == dsh-visual-memory" layer
 ```
+
+One bundle layer, seven tools. Remove with `dsh plugin --profile <name> remove dsh-visual-memory`.
+The npm short form (`add dsh-visual-memory`) lands with the first npm release.
 
 From a local checkout:
 
@@ -25,7 +26,25 @@ git clone https://github.com/xiciyang/dsh-visual-memory
 dsh plugin --profile <name> add ./dsh-visual-memory
 ```
 
-Once published to npm, `dsh plugin --profile <name> add dsh-visual-memory` will be the short form.
+## 30-second decision
+
+| You want | Reach for | Instead of |
+|---|---|---|
+| the exact colour of a cell in a past screenshot | `visual_read_pixels` | asking a vision model to look again and trusting the hex |
+| compare two UI states, or replay a frame | `visual_inspect`, `visual_compare` | re-uploading both images every turn |
+| find the image from turn 40 | `visual_recall` (text / tag / sha256 / turn range / dHash) | scrolling the transcript |
+| keep a screenshot byte-identical | `visual_remember` (verbatim, content-addressed) | base64 inside a text-memory entry |
+
+**Not a fit if** you need a cloud image host (this is local and file-backed),
+Android (the pixel engine spawns `python3`), or one-off "describe this image" —
+DSH native image input already covers that.
+
+## Why not another text-memory entry
+
+Text memory stores *descriptions*; this stores *bytes*. The original file is
+committed verbatim, addressed by sha256, and every later question is answered
+from that original — not from a vision model's paraphrase. Two consequences:
+pixel values stay exact, and the answer does not change when you switch models.
 
 ## Quick start
 

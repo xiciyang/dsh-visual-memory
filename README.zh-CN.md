@@ -1,9 +1,42 @@
 # dsh-visual-memory
 
-给 DSH agent 的**无损视觉记忆**：图存一次，之后永远可寻址；能放大看、能并排比、能精确读像素——
-并且明确回答一个问题：**当前这条模型路由，到底能不能"看见"图？**
+给 DSH agent 的**无损视觉记忆**：图存一次，之后每个问题都从原始字节回答——像素精确、帧可重放、
+可按文字/标签/sha256/轮次/近似重复找回，不经过第二个视觉模型的转述。
 
-[English](./README.md) | 中文
+![存一次，读得准，找得回](docs/demo.png)
+
+`DSH 0.2.0-rc.2` · `Node >= 22` · MIT · `node verify.mjs` 17/17
+
+English | 中文
+
+## 安装
+
+```sh
+dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
+dsh --profile <name> --dump-config      # 应出现 "# == dsh-visual-memory" 这一层
+```
+
+一个 bundle 层、七个工具。卸载：`dsh plugin --profile <name> remove dsh-visual-memory`。
+npm 短命令（`add dsh-visual-memory`）随首次 npm 发布开放。
+
+从本地源码装：
+
+```sh
+git clone https://github.com/xiciyang/dsh-visual-memory
+dsh plugin --profile <name> add ./dsh-visual-memory
+```
+
+## 30 秒判断它是否适合你
+
+| 你要做的事 | 用这个 | 而不是 |
+|---|---|---|
+| 读某个历史截图里某一格的精确颜色 | `visual_read_pixels` | 让视觉模型"再看一眼"然后信它编的 hex |
+| 对比两个 UI 状态 / 重放某一帧 | `visual_inspect`、`visual_compare` | 每轮都重新上传两张图 |
+| 找回第 40 轮见过的那张图 | `visual_recall`（文字/标签/sha256/轮次/dHash） | 往回翻对话 |
+| 原样保存一张截图（不改一个字节） | `visual_remember`（逐字节、内容寻址） | base64 塞进文本记忆 |
+
+**不适合**：你要的是云端图床（这里是本地文件）、Android（像素引擎会起 `python3`）、
+或者只是一次性"描述这张图"——DSH 原生图片输入已经覆盖。
 
 ## 为什么不是"又一个记忆插件"
 
