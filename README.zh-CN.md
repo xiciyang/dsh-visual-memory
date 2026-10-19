@@ -16,15 +16,15 @@ English | 中文
 dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
 
 # npm（registry.npmjs.org）短命令
-dsh plugin --profile <name> add dsh-visual-memory
-dsh --profile <name> --dump-config      # 应出现 "# == dsh-visual-memory" 这一层
+dsh plugin --profile <name> add @xiciyang/dsh-visual-memory
+dsh --profile <name> --dump-config      # 应出现 "# == @xiciyang/dsh-visual-memory" 这一层
 ```
 
 > **装的时候报 `0.0.0-stage`？** 那是 pnpm 的元数据缓存过期（首次 staged 发布留下的占位版本被缓存了），
 > 不是包坏了：`pnpm store prune`，或删掉 `~/.cache/pnpm/*/metadata/<registry>/dsh-visual-memory.jsonl` 再装即可。
-> 当前版本用 `npm view dsh-visual-memory version` 查。
+> 当前版本用 `npm view @xiciyang/dsh-visual-memory version` 查。
 
-一个 bundle 层、七个工具。卸载：`dsh plugin --profile <name> remove dsh-visual-memory`。
+一个 bundle 层、七个工具。卸载：`dsh plugin --profile <name> remove @xiciyang/dsh-visual-memory`。
 
 从本地源码装：
 
@@ -58,7 +58,7 @@ dsh plugin --profile <name> add ./dsh-visual-memory
 ```sh
 # 从公开仓库装（npm 发布待完成）
 dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
-dsh --profile <name> --dump-config   # 应出现 "# == dsh-visual-memory" 这一层
+dsh --profile <name> --dump-config   # 应出现 "# == @xiciyang/dsh-visual-memory" 这一层
 ```
 
 从本地源码装：

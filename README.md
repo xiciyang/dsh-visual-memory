@@ -16,16 +16,16 @@ model in the loop.
 dsh plugin --profile <name> add github:xiciyang/dsh-visual-memory
 
 # npm (registry.npmjs.org): short form
-dsh plugin --profile <name> add dsh-visual-memory
-dsh --profile <name> --dump-config      # expect a "# == dsh-visual-memory" layer
+dsh plugin --profile <name> add @xiciyang/dsh-visual-memory
+dsh --profile <name> --dump-config      # expect a "# == @xiciyang/dsh-visual-memory" layer
 ```
 
 > **Install error mentioning `0.0.0-stage`?** That is a stale pnpm metadata cache, not a
 > broken package: the first staged publish left a placeholder version in the cache. Clear it
 > with `pnpm store prune` (or delete `~/.cache/pnpm/*/metadata/<registry>/dsh-visual-memory.jsonl`)
-> and re-run the install. `npm view dsh-visual-memory version` shows the current version.
+> and re-run the install. `npm view @xiciyang/dsh-visual-memory version` shows the current version.
 
-One bundle layer, seven tools. Remove with `dsh plugin --profile <name> remove dsh-visual-memory`.
+One bundle layer, seven tools. Remove with `dsh plugin --profile <name> remove @xiciyang/dsh-visual-memory`.
 
 From a local checkout:
 

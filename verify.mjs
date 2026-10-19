@@ -61,7 +61,7 @@ try {
     const declared = [...patch.matchAll(/^\s+- (\w+)$/gm)].map((m) => m[1]).sort()
     assert.deepEqual(declared, ['attachments', 'connection', 'fs', 'systemPrompt', 'tools', 'webServer'])
     assert.match(patch, /id: visual-memory/)
-    assert.match(patch, /name: 'dsh-visual-memory'/)
+    assert.match(patch, /name: '@xiciyang\/dsh-visual-memory'/)
     return 'cordis.patch.yml declares the same 6 services'
   })
 
@@ -71,9 +71,9 @@ try {
     // CI has no DSH profile: report the skip instead of failing on the host's state.
     if (!fs.existsSync(profile)) return 'skipped: no profiles/web under this DSH_HOME' 
     const pkg = JSON.parse(fs.readFileSync(path.join(profile, 'package.json'), 'utf8'))
-    assert.ok(pkg.dependencies['dsh-visual-memory'], 'dependency missing')
-    assert.ok(pkg.dsh.profile.bundles.includes('dsh-visual-memory'), 'bundles entry missing')
-    assert.ok(fs.existsSync(path.join(profile, 'node_modules', 'dsh-visual-memory')), 'node_modules link missing')
+    assert.ok(pkg.dependencies['@xiciyang/dsh-visual-memory'], 'dependency missing')
+    assert.ok(pkg.dsh.profile.bundles.includes('@xiciyang/dsh-visual-memory'), 'bundles entry missing')
+    assert.ok(fs.existsSync(path.join(profile, 'node_modules', '@xiciyang', 'dsh-visual-memory')), 'node_modules link missing')
     return 'dependency + bundles entry + node_modules link all present'
   })
 

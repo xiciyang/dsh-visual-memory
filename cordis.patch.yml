@@ -2,7 +2,7 @@
 # `name` resolves as an npm package through the profile's node_modules.
 - insert:
     - id: visual-memory
-      name: 'dsh-visual-memory'
+      name: '@xiciyang/dsh-visual-memory'
       inject:
         - tools
         - attachments
