@@ -20,11 +20,10 @@ dsh plugin --profile <name> add dsh-visual-memory
 dsh --profile <name> --dump-config      # expect a "# == dsh-visual-memory" layer
 ```
 
-> If your environment uses a China mirror (e.g. `registry.npmmirror.com`), its `latest`
-> tag can still point at the `0.0.0-stage` placeholder npm created for the first staged
-> publish, and installing that placeholder fails with `ERR_PNPM_TARBALL_EXTRACT`.
-> Use the `github:` form above until the mirror syncs; the npm short form is only safe
-> against a registry that already reports `latest = 0.1.5` (`npm view dsh-visual-memory version`).
+> **Install error mentioning `0.0.0-stage`?** That is a stale pnpm metadata cache, not a
+> broken package: the first staged publish left a placeholder version in the cache. Clear it
+> with `pnpm store prune` (or delete `~/.cache/pnpm/*/metadata/<registry>/dsh-visual-memory.jsonl`)
+> and re-run the install. `npm view dsh-visual-memory version` shows the current version.
 
 One bundle layer, seven tools. Remove with `dsh plugin --profile <name> remove dsh-visual-memory`.
 

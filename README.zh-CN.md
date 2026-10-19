@@ -20,9 +20,9 @@ dsh plugin --profile <name> add dsh-visual-memory
 dsh --profile <name> --dump-config      # 应出现 "# == dsh-visual-memory" 这一层
 ```
 
-> 用国内镜像（`registry.npmmirror.com`）时，镜像的 `latest` 可能仍指向首次 staged 发布留下的
-> `0.0.0-stage` 占位版本，安装会报 `ERR_PNPM_TARBALL_EXTRACT`。镜像同步前请用上面的 `github:` 形式；
-> 只有 `npm view dsh-visual-memory version` 已经返回 `0.1.5` 的 registry，npm 短命令才安全。
+> **装的时候报 `0.0.0-stage`？** 那是 pnpm 的元数据缓存过期（首次 staged 发布留下的占位版本被缓存了），
+> 不是包坏了：`pnpm store prune`，或删掉 `~/.cache/pnpm/*/metadata/<registry>/dsh-visual-memory.jsonl` 再装即可。
+> 当前版本用 `npm view dsh-visual-memory version` 查。
 
 一个 bundle 层、七个工具。卸载：`dsh plugin --profile <name> remove dsh-visual-memory`。
 
