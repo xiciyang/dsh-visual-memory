@@ -32,7 +32,8 @@ const work = fs.mkdtempSync(path.join(os.tmpdir(), 'vm-verify-'))
 const results = []
 const check = async (name, fn) => {
   try {
-    results.push({ name, ok: true, detail: (await fn()) ?? '' })
+    const detail = (await fn()) ?? ''
+    results.push({ name, ok: true, skipped: /^skipped:/.test(detail), detail })
   } catch (error) {
     results.push({ name, ok: false, detail: String(error?.message ?? error) })
   }
@@ -67,6 +68,8 @@ try {
   // --------------------------------------------------------------- 2. wiring
   await check('profiles/web wires the bundle for restart', () => {
     const profile = path.join(HOME, 'profiles', 'web')
+    // CI has no DSH profile: report the skip instead of failing on the host's state.
+    if (!fs.existsSync(profile)) return 'skipped: no profiles/web under this DSH_HOME' 
     const pkg = JSON.parse(fs.readFileSync(path.join(profile, 'package.json'), 'utf8'))
     assert.ok(pkg.dependencies['dsh-visual-memory'], 'dependency missing')
     assert.ok(pkg.dsh.profile.bundles.includes('dsh-visual-memory'), 'bundles entry missing')
