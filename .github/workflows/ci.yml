@@ -14,6 +14,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
+      - name: python deps (pixel engine)
+        run: python3 -m pip install --quiet pillow
       - name: unit + integration checks
         run: npm test
       - name: bundle contract
